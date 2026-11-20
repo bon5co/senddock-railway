@@ -23,7 +23,7 @@ export REDIS_URL="redis://:$REDIS_PASS@$REDIS_HOST:6379"
   until curl -fsS -o /dev/null "$base/health" 2>/dev/null; do
     i=$((i+1)); [ "$i" -le 180 ] || { echo "[railway-boot] server never answered, administrator not created" >&2; exit 0; }; sleep 1
   done
-  need_setup=$(curl -fsS "$base/api/v1/setup/status" | jq -r '.setup_required // empty' || true)
+  need_setup=$(curl -fsS "$base/api/v1/setup/status" | jq -r '.setup_required | tostring' || true)
   if [ "$need_setup" = "true" ]; then
     body=$(jq -nc --arg n "${SENDDOCK_ADMIN_NAME:-Admin}" --arg e "$SENDDOCK_ADMIN_EMAIL" --arg p "$SENDDOCK_ADMIN_PASSWORD" --arg u "${PUBLIC_URL:-}" \
       '{name:$n,email:$e,password:$p,public_url:$u}')
